@@ -8,6 +8,8 @@
 #   Special thanks to Visegrady, Tamas - "If it was hard to write, it should be hard to read"
 
 # Global variables
+ornArray = Array.new
+lineHash = Hash.new
 prevORN = ""
 prevTYPE = ""
 prevFEAT = ""
@@ -26,13 +28,10 @@ qty = 0
         		puts str[10, 6]
         		puts "------"
 
-        		if prevFEAT != str[38,6]
-        			if qty != 0
-	        			puts "#{str[38,6]}\t#{qty}"
-	        			qty = 0
-	        		else
-	        			qty = qty + 1
-	        		end
+        		if ornArray.length == 0
+        			qty += 1
+        			lineHash = {"ORN" => str[10,6], "TYPE" => str[18,4], "MOD" => str[24,3], "DESC" => str[48,30]}
+        			ornArray.push(linesHash)
         		end
         		
         	end
