@@ -24,20 +24,27 @@ qty = 0
         # TODO need to put as regexp above
        if line =~ /[a-zA-Z]/
        		if prevORN != str[10, 6]
-        		puts "\n"
-        		puts str[10, 6]
-        		puts "------"
 
         		if ornArray.length == 0
         			qty += 1
-        			lineHash = {"ORN" => str[10,6], "TYPE" => str[18,4], "MOD" => str[24,3], "DESC" => str[48,30]}
-        			ornArray.push(linesHash)
+        			lineHash = {"ORN" => str[10,6], "TYPE" => str[18,4], "MOD" => str[24,3], "QTY" => qty, "DESC" => str[48,30].gsub(/\s/,"")}
+        			ornArray.push(lineHash)
+        			ornArray = []
+        			prevORN = str[10,6]
+        		end
+
+        	else
+        		if ornArray.length != 0
+        			if if prevFEAT != str[38,6]
+
         		end
         		
         	end
         end
     end
 end
+
+puts ornArray
 
 =begin
 if prevTYPE != str[18,4]
