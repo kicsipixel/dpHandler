@@ -16,7 +16,7 @@ prevORN = ""
 prevFEAT = ""
 qty = 0
 
-if ARGV.length > 1
+if ARGV.length > 0
     file= ARGV.first
 
     f = File.open(file, "r")
@@ -26,46 +26,49 @@ if ARGV.length > 1
             # read every line into string
             str = line
             str.length
-            # TODO need to put as regexp above
-           if line =~ /[a-zA-Z]/
-           		if prevORN != str[10, 6]
-            	   if tempArray.length == 0
+
+            if line =~ /[a-zA-z]/
+                # different order number
+                if prevORN != str[10, 6]
+                    # array is empty
+                    if tempArray.length == 0
                         qty += 1
-                        lineHash = {"ORN" => str[10,6], "TYPE" => str[18,4], "MOD" => str[24,3], "QTY" => qty, "DESC" => str[48,30].gsub(/\s/,"")}
+                        lineHash = {"ORN" => str[10,6], "TYPE" => str[18,4], "MOD" => str[24,3], "QTY" => qty, "DESC" => str[48,30].strip}
                         tempArray.push(lineHash)
-                        prevORN = str[10,6]
-            	   end
+                    else
+                        ornArray.push(tempArray.last)
+                        tempArray = []
+                        qty = 1
+                        lineHash = {"ORN" => str[10,6], "TYPE" => str[18,4], "MOD" => str[24,3], "QTY" => qty, "DESC" => str[48,30].strip}
+                        tempArray.push(lineHash)
+                    end
+                    prevORN = str[10,6]
+                #same order number
                 else
                     if tempArray.length != 0
-                        if prevFEAT != str[28,6]
+                        if prevFEAT == str[38,6]
+                            qty += 1
+                            lineHash = {"ORN" => str[10,6], "TYPE" => str[18,4], "MOD" => str[24,3], "QTY" => qty, "DESC" => str[48,30].strip}
+                            tempArray.push(lineHash)
+                            prevFEAT = str[38,6]
+                        else
                             ornArray.push(tempArray.last)
                             tempArray = []
                             qty = 1
-                            lineHash = {"ORN" => str[10,6], "TYPE" => str[18,4], "MOD" => str[24,3], "QTY" => qty, "DESC" => str[48,30].gsub(/\s/,"")}
+                            lineHash = {"ORN" => str[10,6], "TYPE" => str[18,4], "MOD" => str[24,3], "QTY" => qty, "DESC" => str[48,30].strip}
                             tempArray.push(lineHash)
-                        else
-                            qty += 1
-                            lineHash = {"ORN" => str[10,6], "TYPE" => str[18,4], "MOD" => str[24,3], "QTY" => qty, "DESC" => str[48,30].gsub(/\s/,"")}
-                            tempArray.push(lineHash)
+                            prevFEAT = str[38,6]
                         end
                     end
-            	end
+                    prevORN = str[10,6]
+                end
             end
-
         end
     }
-    f.close
+    # don't forget the last line
+    ornArray.push(tempArray.last)
 else
     puts "You need files to proceed."
 end
 
 puts ornArray
-
-=begin
-z = ARGV.length
-puts z
-puts "first: #{ARGV.first}"
-for i in 1..ARGV.length-1
-    puts "#{i+1}. : #{ARGV[i]}"
-end  
-=end
